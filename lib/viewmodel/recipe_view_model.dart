@@ -23,7 +23,9 @@ class RecipeViewModel extends ChangeNotifier {
       if (title == null) {
         errorMessage = 'Рецепты не найдены';
       }
-    } catch (_) {
+    } catch (error, stackTrace) {
+      debugPrint('Failed to load recipe: $error');
+      debugPrintStack(stackTrace: stackTrace);
       errorMessage = 'Не удалось загрузить рецепт';
     } finally {
       isLoading = false;
