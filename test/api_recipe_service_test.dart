@@ -15,10 +15,10 @@ void main() {
               Response(
                 requestOptions: options,
                 statusCode: 200,
-                data: jsonEncode([
+                data: [
                   {'id': 1, 'title': 'Pasta'},
                   {'id': 2, 'title': 'Soup'},
-                ]),
+                ],
               ),
             );
           },
@@ -31,6 +31,32 @@ void main() {
 
     expect(recipes, hasLength(2));
     expect(recipes.first.title, 'Pasta');
+  });
+
+  test('fetchRecipes parses string JSON payloads', () async {
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.resolve(
+              Response(
+                requestOptions: options,
+                statusCode: 200,
+                data: jsonEncode([
+                  {'id': 3, 'title': 'Cake'},
+                ]),
+              ),
+            );
+          },
+        ),
+      );
+
+    final service = ApiRecipeService(client: dio);
+
+    final recipes = await service.fetchRecipes();
+
+    expect(recipes, hasLength(1));
+    expect(recipes.single.title, 'Cake');
   });
 
   test('fetchRecipes throws on non-200 responses', () async {

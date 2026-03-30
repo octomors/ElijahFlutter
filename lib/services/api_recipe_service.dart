@@ -24,18 +24,18 @@ class ApiRecipeService implements RecipeService {
         );
       }
 
-      var decoded = response.data;
-      if (decoded is String) {
-        decoded = jsonDecode(decoded);
+      var responseData = response.data;
+      if (responseData is String) {
+        responseData = jsonDecode(responseData);
       }
 
-      if (decoded is! List) {
+      if (responseData is! List) {
         throw Exception(
-          'Unexpected response format: expected List but got ${decoded.runtimeType}',
+          'Unexpected response format: expected List but got ${responseData.runtimeType}',
         );
       }
 
-      return decoded.map((item) {
+      return responseData.map((item) {
         if (item is! Map<String, dynamic>) {
           throw Exception(
             'Unexpected recipe item format: ${item.runtimeType}',
