@@ -26,33 +26,35 @@ class ApiRecipeService implements RecipeService {
 
   @override
   Future<List<Recipe>> fetchRecipes() async {
+    final Response response;
     try {
-      final response = await _client.get('$baseUrl/recipes/');
-      if (response.statusCode != 200) {
-        throw RecipeServiceException(
-          'Failed to load recipes (status ${response.statusCode})',
-        );
-      }
-
-      final rawData = response.data;
-      final responseData = rawData is String ? jsonDecode(rawData) : rawData;
-
-      if (responseData is! List) {
-        throw RecipeServiceException(
-          'Unexpected response format: expected List but got ${responseData.runtimeType}',
-        );
-      }
-
-      return responseData.map((item) {
-        if (item is! Map<String, dynamic>) {
-          throw RecipeServiceException(
-            'Unexpected recipe item format: ${item.runtimeType}',
-          );
-        }
-        return Recipe.fromJson(item);
-      }).toList();
+      response = await _client.get('$baseUrl/recipes/');
     } on DioException catch (error) {
       throw RecipeServiceException('Failed to load recipes', error);
     }
+
+    if (response.statusCode != 200) {
+      throw RecipeServiceException(
+        'Failed to load recipes (status ${response.statusCode})',
+      );
+    }
+
+    final rawData = response.data;
+    final responseData = rawData is String ? jsonDecode(rawData) : rawData;
+
+    if (responseData is! List) {
+      throw RecipeServiceException(
+        'Unexpected response format: expected List but got ${responseData.runtimeType}',
+      );
+    }
+
+    return responseData.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw RecipeServiceException(
+          'Unexpected recipe item format: ${item.runtimeType}',
+        );
+      }
+      return Recipe.fromJson(item);
+    }).toList();
   }
 }
