@@ -48,7 +48,7 @@ class ApiRecipeService implements RecipeService {
         'type ${error.type.name}',
         if (error.response?.statusCode != null)
           'status ${error.response?.statusCode}',
-        if (error.message != null && error.message!.isNotEmpty) error.message!,
+        if (error.message?.isNotEmpty ?? false) error.message!,
       ].join(', ');
       throw Exception('Failed to load recipes ($details)');
     }
