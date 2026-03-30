@@ -23,10 +23,8 @@ class ApiRecipeService implements RecipeService {
       );
     }
 
-    var responseData = response.data;
-    if (responseData is String) {
-      responseData = jsonDecode(responseData);
-    }
+    final rawData = response.data;
+    final responseData = rawData is String ? jsonDecode(rawData) : rawData;
 
     if (responseData is! List) {
       throw Exception(
