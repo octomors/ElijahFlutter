@@ -30,7 +30,10 @@ class ApiRecipeService implements RecipeService {
     try {
       response = await _client.get('$baseUrl/recipes/');
     } on DioException catch (error) {
-      throw RecipeServiceException('Failed to load recipes', error);
+      throw RecipeServiceException(
+        'Failed to connect to recipe service (${error.type.name})',
+        error,
+      );
     }
 
     if (response.statusCode != 200) {
