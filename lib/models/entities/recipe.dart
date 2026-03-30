@@ -67,7 +67,7 @@ class Recipe {
     }
 
     final allergensValue = json['allergens'];
-    List<Allergen> allergens = const [];
+    List<Allergen> allergens = [];
     if (allergensValue != null) {
       if (allergensValue is! List) {
         throw FormatException('Invalid recipe JSON: $json');
@@ -81,7 +81,7 @@ class Recipe {
     }
 
     final ingredientsValue = json['ingredients'];
-    List<RecipeIngredient> ingredients = const [];
+    List<RecipeIngredient> ingredients = [];
     if (ingredientsValue != null) {
       if (ingredientsValue is! List) {
         throw FormatException('Invalid recipe JSON: $json');
