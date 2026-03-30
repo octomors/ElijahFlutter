@@ -67,8 +67,10 @@ class Recipe {
     }
 
     final allergensValue = json['allergens'];
-    List<Allergen> allergens = [];
-    if (allergensValue != null) {
+    final List<Allergen> allergens;
+    if (allergensValue == null) {
+      allergens = [];
+    } else {
       if (allergensValue is! List) {
         throw FormatException('Invalid recipe JSON: $json');
       }
@@ -81,8 +83,10 @@ class Recipe {
     }
 
     final ingredientsValue = json['ingredients'];
-    List<RecipeIngredient> ingredients = [];
-    if (ingredientsValue != null) {
+    final List<RecipeIngredient> ingredients;
+    if (ingredientsValue == null) {
+      ingredients = [];
+    } else {
       if (ingredientsValue is! List) {
         throw FormatException('Invalid recipe JSON: $json');
       }
@@ -98,8 +102,8 @@ class Recipe {
       id: idValue.toInt(),
       title: titleValue,
       description: descriptionValue as String?,
-      cookingTime: cookingTimeValue == null ? null : cookingTimeValue.toInt(),
-      difficulty: difficultyValue == null ? null : difficultyValue.toInt(),
+      cookingTime: (cookingTimeValue as num?)?.toInt(),
+      difficulty: (difficultyValue as num?)?.toInt(),
       cuisine: cuisine,
       author: author,
       allergens: allergens,
