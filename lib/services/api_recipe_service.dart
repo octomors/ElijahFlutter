@@ -44,7 +44,13 @@ class ApiRecipeService implements RecipeService {
         return Recipe.fromJson(item);
       }).toList();
     } on DioException catch (error) {
-      throw Exception('Failed to load recipes: ${error.message}');
+      final details = <String>[
+        'type ${error.type.name}',
+        if (error.response?.statusCode != null)
+          'status ${error.response?.statusCode}',
+        if (error.message != null && error.message!.isNotEmpty) error.message!,
+      ].join(', ');
+      throw Exception('Failed to load recipes ($details)');
     }
   }
 }

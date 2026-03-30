@@ -79,4 +79,34 @@ void main() {
 
     await expectLater(service.fetchRecipes(), throwsException);
   });
+
+  test('fetchRecipes throws on DioException failures', () async {
+    final dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            handler.reject(
+              DioException(
+                requestOptions: options,
+                type: DioExceptionType.connectionTimeout,
+                message: 'timeout',
+              ),
+            );
+          },
+        ),
+      );
+
+    final service = ApiRecipeService(client: dio);
+
+    await expectLater(
+      service.fetchRecipes(),
+      throwsA(
+        predicate(
+          (error) =>
+              error is Exception &&
+              error.toString().contains('connectionTimeout'),
+        ),
+      ),
+    );
+  });
 }
