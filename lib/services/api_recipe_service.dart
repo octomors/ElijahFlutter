@@ -38,14 +38,14 @@ class ApiRecipeService implements RecipeService {
       final responseData = rawData is String ? jsonDecode(rawData) : rawData;
 
       if (responseData is! List) {
-        throw Exception(
+        throw RecipeServiceException(
           'Unexpected response format: expected List but got ${responseData.runtimeType}',
         );
       }
 
       return responseData.map((item) {
         if (item is! Map<String, dynamic>) {
-          throw Exception(
+          throw RecipeServiceException(
             'Unexpected recipe item format: ${item.runtimeType}',
           );
         }
