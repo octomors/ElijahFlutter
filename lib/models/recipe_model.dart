@@ -12,13 +12,9 @@ class RecipeModel {
       return null;
     }
 
-    Recipe smallest = recipes.first;
-    for (final recipe in recipes.skip(1)) {
-      if (recipe.id < smallest.id) {
-        smallest = recipe;
-      }
-    }
-    return smallest;
+    return recipes.reduce((first, second) {
+      return first.id < second.id ? first : second;
+    });
   }
 
   Future<String?> fetchFirstRecipeTitle() async {
