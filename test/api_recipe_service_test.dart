@@ -103,8 +103,10 @@ void main() {
       throwsA(
         predicate(
           (error) =>
-              error is DioException &&
-              error.type == DioExceptionType.connectionTimeout,
+              error is RecipeServiceException &&
+              error.cause is DioException &&
+              (error.cause as DioException).type ==
+                  DioExceptionType.connectionTimeout,
         ),
       ),
     );
