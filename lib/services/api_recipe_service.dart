@@ -17,7 +17,10 @@ class ApiRecipeService implements RecipeService {
   @override
   Future<List<Recipe>> fetchRecipes() async {
     try {
-      final response = await _client.get('$baseUrl/recipes/');
+      final response = await _client.get(
+        '$baseUrl/recipes/',
+        options: Options(validateStatus: (_) => true),
+      );
       if (response.statusCode != 200) {
         throw Exception(
           'Failed to load recipes (status ${response.statusCode})',
@@ -44,11 +47,12 @@ class ApiRecipeService implements RecipeService {
         return Recipe.fromJson(item);
       }).toList();
     } on DioException catch (error) {
+      final message = error.message;
       final details = <String>[
         'type ${error.type.name}',
         if (error.response?.statusCode != null)
           'status ${error.response?.statusCode}',
-        if (error.message?.isNotEmpty ?? false) error.message!,
+        if (message != null && message.isNotEmpty) message,
       ].join(', ');
       throw Exception('Failed to load recipes ($details)');
     }
