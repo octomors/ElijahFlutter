@@ -1,30 +1,44 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
 import 'package:elijahflutter/main.dart';
+import 'package:elijahflutter/models/entities/recipe.dart';
+import 'package:elijahflutter/models/interfaces/recipe_service.dart';
+import 'package:elijahflutter/models/recipe_model.dart';
+import 'package:elijahflutter/viewmodel/recipe_view_model.dart';
+
+class FakeRecipeService implements RecipeService {
+  @override
+  Future<List<Recipe>> fetchRecipes() async {
+    return const [
+      Recipe(id: 2, title: 'Borscht'),
+      Recipe(id: 1, title: 'Salad'),
+    ];
+  }
+}
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Shows recipe title with smallest id',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<RecipeModel>(
+            create: (_) => RecipeModel(FakeRecipeService()),
+          ),
+          ChangeNotifierProvider<RecipeViewModel>(
+            create: (context) => RecipeViewModel(context.read<RecipeModel>()),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Salad'), findsNothing);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.tap(find.text('Показать рецепт с минимальным Id'));
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Salad'), findsOneWidget);
   });
 }
