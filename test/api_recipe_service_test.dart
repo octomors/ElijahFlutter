@@ -103,8 +103,8 @@ void main() {
       throwsA(
         predicate(
           (error) =>
-              error is Exception &&
-              error.toString().contains('connectionTimeout'),
+              error is DioException &&
+              error.type == DioExceptionType.connectionTimeout,
         ),
       ),
     );
