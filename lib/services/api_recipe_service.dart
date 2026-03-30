@@ -1,37 +1,59 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import '../models/entities/recipe.dart';
 import '../models/interfaces/recipe_service.dart';
 
+class RecipeServiceException implements Exception {
+  const RecipeServiceException(this.message, [this.cause]);
+
+  final String message;
+  final Object? cause;
+
+  @override
+  String toString() => cause == null ? message : '$message: $cause';
+}
+
 class ApiRecipeService implements RecipeService {
   ApiRecipeService({
-    http.Client? client,
+    Dio? client,
     this.baseUrl = 'http://localhost:8000/api',
-  }) : _client = client ?? http.Client();
+  }) : _client = client ?? Dio();
 
-  final http.Client _client;
+  final Dio _client;
   final String baseUrl;
 
   @override
   Future<List<Recipe>> fetchRecipes() async {
-    final uri = Uri.parse('$baseUrl/recipes/');
-    final response = await _client.get(uri);
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load recipes (status ${response.statusCode})');
-    }
-
-    final decoded = jsonDecode(response.body);
-    if (decoded is! List) {
-      throw Exception(
-        'Unexpected response format: expected List but got ${decoded.runtimeType}',
+    final Response response;
+    try {
+      response = await _client.get('$baseUrl/recipes/');
+    } on DioException catch (error) {
+      throw RecipeServiceException(
+        'Failed to connect to recipe service (${error.type.name})',
+        error,
       );
     }
 
-    return decoded.map((item) {
+    if (response.statusCode != 200) {
+      throw RecipeServiceException(
+        'Failed to load recipes (status ${response.statusCode})',
+      );
+    }
+
+    final rawData = response.data;
+    final responseData = rawData is String ? jsonDecode(rawData) : rawData;
+
+    if (responseData is! List) {
+      throw RecipeServiceException(
+        'Unexpected response format: expected List but got ${responseData.runtimeType}',
+      );
+    }
+
+    return responseData.map((item) {
       if (item is! Map<String, dynamic>) {
-        throw Exception(
+        throw RecipeServiceException(
           'Unexpected recipe item format: ${item.runtimeType}',
         );
       }
